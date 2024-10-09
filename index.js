@@ -57,10 +57,10 @@ function getLabelValue(task, labelType) {
 
 // Function to determine priority based on ICE score
 function determinePriority(iceScore) {
-    if (iceScore >= 70) return 1; // High Priority
-    if (iceScore >= 50) return 2; // Medium-High Priority
-    if (iceScore >= 30) return 3; // Medium-Low Priority
-    return 4; // Low Priority
+    if (iceScore >= 70) return 4; // High Priority
+    if (iceScore >= 50) return 3; // Medium-High Priority
+    if (iceScore >= 30) return 2; // Medium-Low Priority
+    return 1; // Low Priority
 }
 
 
