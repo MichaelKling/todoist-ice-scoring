@@ -1,0 +1,9 @@
+version: '3.8'  # Specify the Compose file format version
+
+services:
+  todoist-ice-scoring:
+    build: .
+    restart: unless-stopped  # Automatically restart the service unless it is explicitly stopped
+    env_file: .env  # Load environment variables from the .env file
+    ports:
+      - "${PORT}:${PORT}"  # Map the host's PORT to the container's PORT
