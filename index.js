@@ -25,6 +25,10 @@ const headers = {
     'Content-Type': 'application/json'
 };
 
+let lastProcessedTime = 0; // Timestamp for the last processed request
+const MIN_INTERVAL = 5000; // Minimum time interval between requests (in milliseconds)
+let isProcessing = false; // Flag to indicate if a process is in progress
+
 // Function to get tasks from Todoist using a filter
 async function getTasks() {
     try {
@@ -127,9 +131,33 @@ async function processTasks() {
 // Define a webhook endpoint to trigger the processing of tasks
 app.post('/webhook', async (req, res) => {
     try {
+        const currentTime = Date.now();
+
+        // Check if we should process the tasks (5 seconds flood protection)
+        if (isProcessing || currentTime - lastProcessedTime < MIN_INTERVAL) {
+            console.log('Skipping processing to avoid flooding.');
+            return res.status(200).send('Already processing webhooks. Please wait.');
+        }
+
+        // Update the last processed time
+        lastProcessedTime = currentTime;
+
         console.log('Webhook received. Processing tasks...');
-        await processTasks();
-        res.status(200).send('Tasks processed successfully.');
+	isProcessing = true;
+
+	setTimeout(async () => {
+		try {
+	             console.log('Processing tasks now...');
+		     await processTasks();
+	             console.log('Tasks processed successfully.');
+        	} catch (error) {
+	             console.error('Error processing tasks:', error);
+		} finally {
+		    isProcessing = false;
+		}
+	}, MIN_INTERVAL);
+
+        res.status(200).send('Processing Tasks.');
     } catch (error) {
         console.error('Error processing tasks:', error);
         res.status(500).send('Error processing tasks.');
